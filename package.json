@@ -28,5 +28,10 @@
     "chai": "~1.5.0",
     "mocha": "~1.9.0",
   },
-  "keywords": []
+  "keywords": [],
+  "noflo": {
+    "graphs": {
+      "Main": "./graphs/Main.fbp"
+    }
+  }
 }
