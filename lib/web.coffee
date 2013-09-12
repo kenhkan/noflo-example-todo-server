@@ -1,12 +1,12 @@
-readInstalled = require "read-installed"
-noflo = require "noflo"
+noflo = require 'noflo'
 
 databaseUrl = process.env.DATABASE_URL
 port = process.env.PORT
 
 initializer = """
-  '#{port}' -> LISTEN Graph(todo/Main)
-  '#{databaseUrl}' -> DATABASE Graph()
+  '#{port}' -> PORT Graph(todo/Main)
+  '#{databaseUrl}' -> DATABASE Graph() OUT -> IN Output(core/Output)
+  Graph() ERROR -> IN OutputError(core/Output)
 """
 
 noflo.graph.loadFBP initializer, (graph) ->

@@ -1,0 +1,12 @@
+EXPORT=WRITE.SERVER:DATABASE
+EXPORT=WRITE.OUT:OUT
+EXPORT=WRITE.ERROR:ERROR
+EXPORT=DROPPORT.IN:PORT
+
+DropPort(Repeat) OUT -> IN Drop(Drop)
+
+Write(pgorm/Write) READY -> IN Start(strings/SendString)
+
+'token' -> GROUP Token(core/Group)
+'todos' -> GROUP Table(core/Group)
+'{"id":"1","task":"Go grab NoFlo"}' -> STRING Start() OUT -> IN ParseJson(strings/ParseJson) OUT -> IN Table() OUT -> IN Token() OUT -> IN Write(pgorm/Write)
