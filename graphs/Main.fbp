@@ -1,10 +1,17 @@
-EXPORT=WRITE.SERVER:DATABASE
-EXPORT=WRITE.OUT:OUT
-EXPORT=WRITE.ERROR:ERROR
+EXPORT=SPLITSERVERURL.IN:DATABASE
+EXPORT=READ.OUT:OUT
+EXPORT=READ.ERROR:ERROR
 EXPORT=DROPPORT.IN:PORT
 
 DropPort(Repeat) OUT -> IN Drop(Drop)
 
-'token' -> GROUP Token(core/Group)
-'todos' -> GROUP Table(core/Group)
-'{"id":"1","task":"Go grab NoFlo"}' -> IN ParseJson(strings/ParseJson) OUT -> IN Table() OUT -> IN Token() OUT -> IN Write(pgorm/Write)
+'token' -> GROUP WriteToken(core/Group)
+'todos' -> GROUP WriteTable(core/Group)
+'{"id":"1","task":"Go grab NoFlo"}' -> IN ParseJson(strings/ParseJson) OUT -> IN WriteTable() OUT -> IN WriteToken() OUT -> IN Write(pgorm/Write)
+
+'token' -> GROUP ReadToken(core/Group)
+'todos' -> GROUP ReadTable(core/Group)
+'id,=,cast(1 as text)' -> STRING Payload(strings/SendString) OUT -> IN Arrayify(adapters/TupleToArray) OUT -> IN ReadTable() OUT -> IN ReadToken() OUT -> IN Read(pgorm/Read)
+
+SplitServerUrl(core/Split) OUT -> SERVER Read(pgorm/Read)
+SplitServerUrl() OUT -> IN Payload()
