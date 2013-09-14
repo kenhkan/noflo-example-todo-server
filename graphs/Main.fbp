@@ -14,7 +14,8 @@ EXPORT=SERVER.LISTEN:PORT
 # Database(core/Split) OUT -> SERVER Read(pgorm/Read)
 # Database() OUT -> IN Payload()
 
-Database(core/Split) OUT -> SERVER ListReadDb(pgorm/Read)
+Database(core/Split) OUT -> SERVER ReadListDb(pgorm/Read)
+Database() OUT -> SERVER ReadActiveDb(pgorm/Read)
 
 # HTTP
 
@@ -29,17 +30,33 @@ Output(core/Merge) OUT -> IN SendResponse(webserver/SendResponse)
 
 'true' -> KEEP ListQuery(cache/Cache)
 'todos' -> GROUP ListTable(core/Group)
-'id,LIKE,\'%%\'' -> IN Arrayify(adapters/TupleToArray) OUT -> IN ListTable() OUT -> IN ListQuery()
+'id,LIKE,\'%%\'' -> IN ArrayifyListQuery(adapters/TupleToArray) OUT -> IN ListTable() OUT -> IN ListQuery()
 
-'body' -> IN ArrayifyListPattern(adapters/TupleToArray) OUT -> PATTERN LiftBody(lift/Lift)
-LiftBody() EXTOKEN -> GROUP ListToken(core/Group)
-'1' -> THRESHOLD ReadToken()
+'body' -> IN ArrayifyListPattern(adapters/TupleToArray) OUT -> PATTERN LiftListBody(lift/Lift)
+LiftListBody() EXTOKEN -> GROUP ListToken(core/Group)
+'1' -> THRESHOLD ReadListToken()
 
-ListTodos() OUT -> IN ListToGroups(woute/ToGroups) OUT -> IN LiftBody() EXTRACTED -> READY ListQuery() OUT -> IN ListToken() OUT -> IN ListReadDb()
-ListReadDb() ERROR -> IN ListReadDbError(core/Output)
-ListReadDb() OUT -> IN ReadToken(groups/ReadGroups)
-ReadToken() GROUP -> RETOKEN LiftBody()
-ReadToken() OUT -> IN ArrayifyOutput(adapters/PacketsToArray) OUT -> IN JsonifyOutput(strings/Jsonify) OUT -> RETURN LiftBody() OUT -> IN ListFromGroups(woute/FromGroups) OUT -> IN Output()
+ListTodos() OUT -> IN ListToGroups(woute/ToGroups) OUT -> IN LiftListBody() EXTRACTED -> READY ListQuery() OUT -> IN ListToken() OUT -> IN ReadListDb()
+ReadListDb() ERROR -> IN ReadListDbError(core/Output)
+ReadListDb() OUT -> IN ReadListToken(groups/ReadGroups)
+ReadListToken() GROUP -> RETOKEN LiftListBody()
+ReadListToken() OUT -> IN ArrayifyReadOutput(adapters/PacketsToArray) OUT -> IN JsonifyReadOutput(strings/Jsonify) OUT -> RETURN LiftListBody() OUT -> IN ListFromGroups(woute/FromGroups) OUT -> IN Output()
+
+# Getting only active TODOs
+
+'true' -> KEEP ActiveQuery(cache/Cache)
+'todos' -> GROUP ActiveTable(core/Group)
+'completed,=,true' -> IN ArrayifyActiveQuery(adapters/TupleToArray) OUT -> IN ActiveTable() OUT -> IN ActiveQuery()
+
+'body' -> IN ArrayifyActivePattern(adapters/TupleToArray) OUT -> PATTERN LiftActiveBody(lift/Lift)
+LiftActiveBody() EXTOKEN -> GROUP ActiveToken(core/Group)
+'1' -> THRESHOLD ReadActiveToken()
+
+GetActiveTodos() OUT -> IN ActiveToGroups(woute/ToGroups) OUT -> IN LiftActiveBody() EXTRACTED -> READY ActiveQuery() OUT -> IN ActiveToken() OUT -> IN ReadActiveDb()
+ReadActiveDb() ERROR -> IN ReadActiveDbError(core/Output)
+ReadActiveDb() OUT -> IN ReadActiveToken(groups/ReadGroups)
+ReadActiveToken() GROUP -> RETOKEN LiftActiveBody()
+ReadActiveToken() OUT -> IN ArrayifyActiveOutput(adapters/PacketsToArray) OUT -> IN JsonifyActiveOutput(strings/Jsonify) OUT -> RETURN LiftActiveBody() OUT -> IN ActiveFromGroups(woute/FromGroups) OUT -> IN Output()
 
 # Missing TODOs
 
