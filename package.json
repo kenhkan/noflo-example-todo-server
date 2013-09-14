@@ -18,9 +18,16 @@
     }
   ],
   "dependencies": {
-    "noflo": "https://github.com/kenhkan/noflo/tarball/add_all_detected_components-build",
+    "noflo": "https://github.com/kenhkan/noflo/archive/0.4.0+use_comment_line_matcher.tar.gz",
     "noflo-core": "~0.1.1",
-    "noflo-pgorm": "~0.0.16"
+    "noflo-pgorm": "~0.0.16",
+    "noflo-objects": "~0.1.4",
+    "noflo-woute": "~0.1.2",
+    "noflo-webserver": "0.0.3",
+    "noflo-cache": "0.0.1",
+    "noflo-lift": "0.0.10",
+    "noflo-groups": "~0.1.2",
+    "noflo-packets": "~0.1.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

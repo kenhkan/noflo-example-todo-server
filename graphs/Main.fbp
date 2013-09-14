@@ -1,17 +1,45 @@
-EXPORT=SPLITSERVERURL.IN:DATABASE
-EXPORT=READ.OUT:OUT
-EXPORT=READ.ERROR:ERROR
-EXPORT=DROPPORT.IN:PORT
+EXPORT=DATABASE.IN:DATABASE
+EXPORT=SERVER.LISTEN:PORT
 
-DropPort(Repeat) OUT -> IN Drop(Drop)
+# DATABASE
 
-'token' -> GROUP WriteToken(core/Group)
-'todos' -> GROUP WriteTable(core/Group)
-'{"id":"1","task":"Go grab NoFlo"}' -> IN ParseJson(strings/ParseJson) OUT -> IN WriteTable() OUT -> IN WriteToken() OUT -> IN Write(pgorm/Write)
+# 'token' -> GROUP WriteToken(core/Group)
+# 'todos' -> GROUP WriteTable(core/Group)
+# '{"id":"1","task":"Go grab NoFlo"}' -> IN ParseJson(strings/ParseJson) OUT -> IN WriteTable() OUT -> IN WriteToken() OUT -> IN Write(pgorm/Write)
 
-'token' -> GROUP ReadToken(core/Group)
-'todos' -> GROUP ReadTable(core/Group)
-'id,=,cast(1 as text)' -> STRING Payload(strings/SendString) OUT -> IN Arrayify(adapters/TupleToArray) OUT -> IN ReadTable() OUT -> IN ReadToken() OUT -> IN Read(pgorm/Read)
+# 'token' -> GROUP ReadToken(core/Group)
+# 'todos' -> GROUP ReadTable(core/Group)
+# 'id,LIKE,\'%%\'' -> STRING Payload(strings/SendString) OUT -> IN Arrayify(adapters/TupleToArray) OUT -> IN ReadTable() OUT -> IN ReadToken() OUT -> IN Read(pgorm/Read)
 
-SplitServerUrl(core/Split) OUT -> SERVER Read(pgorm/Read)
-SplitServerUrl() OUT -> IN Payload()
+# Database(core/Split) OUT -> SERVER Read(pgorm/Read)
+# Database() OUT -> IN Payload()
+
+Database(core/Split) OUT -> SERVER ListReadDb(pgorm/Read)
+
+# HTTP
+
+'/list' -> MATCH ListTodos(woute/Match)
+'/active' -> MATCH GetActiveTodos(woute/Match)
+'/update' -> MATCH UpdateTodos(woute/Match)
+
+Server(webserver/Server) REQUEST -> IN BodyParser(webserver/BodyParser) OUT -> IN ListTodos() FAIL -> IN GetActiveTodos() FAIL -> IN UpdateTodos() FAIL -> IN Missing(woute/Match)
+Output(core/Merge) OUT -> IN SendResponse(webserver/SendResponse)
+
+# Listing TODOs
+
+'true' -> KEEP ListQuery(cache/Cache)
+'todos' -> GROUP ListTable(core/Group)
+'id,LIKE,\'%%\'' -> IN Arrayify(adapters/TupleToArray) OUT -> IN ListTable() OUT -> IN ListQuery()
+
+'body' -> IN ArrayifyListPattern(adapters/TupleToArray) OUT -> PATTERN LiftBody(lift/Lift)
+LiftBody() EXTOKEN -> GROUP ListToken(core/Group)
+'1' -> THRESHOLD ReadToken()
+
+ListTodos() OUT -> IN ListToGroups(woute/ToGroups) OUT -> IN LiftBody() EXTRACTED -> READY ListQuery() OUT -> IN ListToken() OUT -> IN ListReadDb()
+ListReadDb() OUT -> IN ReadToken(groups/ReadGroups)
+ReadToken() GROUP -> RETOKEN LiftBody()
+ReadToken() OUT -> IN ArrayifyOutput(adapters/PacketsToArray) OUT -> IN JsonifyOutput(strings/Jsonify) OUT -> RETURN LiftBody() OUT -> IN ListFromGroups(woute/FromGroups) OUT -> IN Output()
+
+# Missing TODOs
+
+Missing() OUT -> IN Output()

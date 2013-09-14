@@ -4,9 +4,8 @@ databaseUrl = process.env.DATABASE_URL
 port = process.env.PORT
 
 initializer = """
-  '#{port}' -> PORT Graph(todo/Main)
-  '#{databaseUrl}' -> DATABASE Graph() OUT -> IN Output(core/Output)
-  Graph() ERROR -> IN OutputError(core/Output)
+  '#{port}' -> PORT Main(todo/Main)
+  '#{databaseUrl}' -> DATABASE Main()
 """
 
 noflo.graph.loadFBP initializer, (graph) ->
