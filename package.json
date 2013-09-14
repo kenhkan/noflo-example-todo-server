@@ -23,9 +23,9 @@
     "noflo-pgorm": "~0.0.16",
     "noflo-objects": "~0.1.4",
     "noflo-woute": "~0.1.2",
-    "noflo-webserver": "0.0.3",
-    "noflo-cache": "0.0.1",
-    "noflo-lift": "0.0.10",
+    "noflo-webserver": "https://github.com/kenhkan/noflo-webserver/archive/0.0.3+disconnect_on_each_request.tar.gz",
+    "noflo-cache": "~0.0.1",
+    "noflo-lift": "~0.0.10",
     "noflo-groups": "~0.1.2",
     "noflo-packets": "~0.1.0"
   },

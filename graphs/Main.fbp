@@ -36,6 +36,7 @@ LiftBody() EXTOKEN -> GROUP ListToken(core/Group)
 '1' -> THRESHOLD ReadToken()
 
 ListTodos() OUT -> IN ListToGroups(woute/ToGroups) OUT -> IN LiftBody() EXTRACTED -> READY ListQuery() OUT -> IN ListToken() OUT -> IN ListReadDb()
+ListReadDb() ERROR -> IN ListReadDbError(core/Output)
 ListReadDb() OUT -> IN ReadToken(groups/ReadGroups)
 ReadToken() GROUP -> RETOKEN LiftBody()
 ReadToken() OUT -> IN ArrayifyOutput(adapters/PacketsToArray) OUT -> IN JsonifyOutput(strings/Jsonify) OUT -> RETURN LiftBody() OUT -> IN ListFromGroups(woute/FromGroups) OUT -> IN Output()
