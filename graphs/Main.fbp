@@ -16,12 +16,14 @@ EXPORT=SERVER.LISTEN:PORT
 
 Database(core/Split) OUT -> SERVER ReadListDb(pgorm/Read)
 Database() OUT -> SERVER ReadActiveDb(pgorm/Read)
+Database() OUT -> SERVER UpdateDb(pgorm/Write)
 
 # HTTP
 
 '/list' -> MATCH ListTodos(woute/Match)
 '/active' -> MATCH GetActiveTodos(woute/Match)
 '/update' -> MATCH UpdateTodos(woute/Match)
+'POST' -> METHOD UpdateTodos()
 
 Server(webserver/Server) REQUEST -> IN BodyParser(webserver/BodyParser) OUT -> IN ListTodos() FAIL -> IN GetActiveTodos() FAIL -> IN UpdateTodos() FAIL -> IN Missing(woute/Match)
 Output(core/Merge) OUT -> IN SendResponse(webserver/SendResponse)
@@ -57,6 +59,23 @@ ReadActiveDb() ERROR -> IN ReadActiveDbError(core/Output)
 ReadActiveDb() OUT -> IN ReadActiveToken(groups/ReadGroups)
 ReadActiveToken() GROUP -> RETOKEN LiftActiveBody()
 ReadActiveToken() OUT -> IN ArrayifyActiveOutput(adapters/PacketsToArray) OUT -> IN JsonifyActiveOutput(strings/Jsonify) OUT -> RETURN LiftActiveBody() OUT -> IN ActiveFromGroups(woute/FromGroups) OUT -> IN Output()
+
+# Creating/Updating TODOs
+
+'true' -> KEEP UpdateQuery(cache/Cache)
+'todos' -> GROUP UpdateTable(core/Group)
+'completed,=,true' -> IN ArrayifyUpdateQuery(adapters/TupleToArray) OUT -> IN UpdateTable() OUT -> IN UpdateQuery()
+
+'body' -> IN ArrayifyUpdatePattern(adapters/TupleToArray) OUT -> PATTERN LiftUpdateBody(lift/Lift)
+LiftUpdateBody() EXTOKEN -> GROUP UpdateToken(core/Group)
+'1' -> THRESHOLD ReadUpdateToken()
+'^headers$' -> REGEXP RemoveHeaders(groups/RemoveGroups)
+
+UpdateTodos() OUT -> IN UpdateToGroups(woute/ToGroups) OUT -> IN LiftUpdateBody() EXTRACTED -> IN RemoveUpdateInputGroups(groups/RemoveGroups) OUT -> IN ConvertUpdateInput(adapters/ObjectToPackets) OUT -> IN UpdateToken() OUT -> IN UpdateDb()
+UpdateDb() ERROR -> IN UpdateDbError(core/Output)
+UpdateDb() OUT -> IN ReadUpdateToken(groups/ReadGroups)
+ReadUpdateToken() GROUP -> RETOKEN LiftUpdateBody()
+ReadUpdateToken() OUT -> IN ArrayifyUpdateOutput(adapters/PacketsToArray) OUT -> IN JsonifyUpdateOutput(strings/Jsonify) OUT -> RETURN LiftUpdateBody() OUT -> IN RemoveHeaders() OUT -> IN UpdateFromGroups(woute/FromGroups) OUT -> IN Output()
 
 # Missing TODOs
 
