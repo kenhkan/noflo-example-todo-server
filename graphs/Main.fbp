@@ -1,7 +1,12 @@
 EXPORT=DATABASE.IN:DATABASE
 EXPORT=SERVER.LISTEN:PORT
 
-# DATABASE
+## TEMPLATES
+
+'target' -> ENCLOSING CreateListTemplate(transparency/Render)
+'./templates/list.html' -> IN ReadListTemplate(filesystem/ReadFileSync) OUT -> TEMPLATE CreateListTemplate()
+
+## DATABASE
 
 # 'token' -> GROUP WriteToken(core/Group)
 # 'todos' -> GROUP WriteTable(core/Group)
@@ -18,7 +23,7 @@ Database(core/Split) OUT -> SERVER ReadListDb(pgorm/Read)
 Database() OUT -> SERVER ReadActiveDb(pgorm/Read)
 Database() OUT -> SERVER UpdateDb(pgorm/Write)
 
-# HTTP
+## HTTP
 
 '/list' -> MATCH ListTodos(woute/Match)
 '/active' -> MATCH GetActiveTodos(woute/Match)
@@ -42,7 +47,7 @@ ListTodos() OUT -> IN ListToGroups(woute/ToGroups) OUT -> IN LiftListBody() EXTR
 ReadListDb() ERROR -> IN ReadListDbError(core/Output)
 ReadListDb() OUT -> IN ReadListToken(groups/ReadGroups)
 ReadListToken() GROUP -> RETOKEN LiftListBody()
-ReadListToken() OUT -> IN ArrayifyReadOutput(adapters/PacketsToArray) OUT -> IN JsonifyReadOutput(strings/Jsonify) OUT -> RETURN LiftListBody() OUT -> IN ListFromGroups(woute/FromGroups) OUT -> IN Output()
+ReadListToken() OUT -> IN ArrayifyReadOutput(adapters/PacketsToArray) OUT -> IN CreateListTemplate() OUT -> RETURN LiftListBody() OUT -> IN ListFromGroups(woute/FromGroups) OUT -> IN Output()
 
 # Getting only active TODOs
 

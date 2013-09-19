@@ -27,7 +27,9 @@
     "noflo-cache": "~0.0.1",
     "noflo-lift": "~0.0.10",
     "noflo-groups": "~0.1.2",
-    "noflo-packets": "~0.1.0"
+    "noflo-packets": "~0.1.0",
+    "noflo-filesystem": "https://github.com/kenhkan/noflo-filesystem/archive/1.0.2+add_readfilesync.tar.gz",
+    "noflo-transparency": "0.0.1"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
