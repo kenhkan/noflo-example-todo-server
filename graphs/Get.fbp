@@ -1,0 +1,18 @@
+EXPORT=TOGROUPS.IN:IN
+EXPORT=ARRAYIFYQUERY.IN:QUERY
+EXPORT=FROMGROUPS.OUT:OUT
+EXPORT=READDB.SERVER:DATABASE
+
+'true' -> KEEP Query(cache/Cache)
+'todos' -> GROUP Table(groups/Group)
+ArrayifyQuery(adapters/TupleToArray) OUT -> IN Table() OUT -> IN Query()
+
+'body' -> IN ArrayifyPattern(adapters/TupleToArray) OUT -> PATTERN LiftBody(lift/Lift)
+LiftBody() EXTOKEN -> GROUP Token(groups/Group)
+'1' -> THRESHOLD ReadToken()
+
+ToGroups(woute/ToGroups) OUT -> IN LiftBody() EXTRACTED -> READY Query() OUT -> IN Token() OUT -> IN ReadDb(pgorm/Read)
+ReadDb() ERROR -> IN ReadDbError(core/Output)
+ReadDb() OUT -> IN ReadToken(groups/ReadGroups)
+ReadToken() GROUP -> RETOKEN LiftBody()
+ReadToken() OUT -> IN ArrayifyOutput(adapters/PacketsToArray) OUT -> IN JsonifyActiveOutput(strings/Jsonify) OUT -> RETURN LiftBody() OUT -> IN FromGroups(woute/FromGroups)

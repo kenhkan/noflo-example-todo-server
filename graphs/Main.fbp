@@ -9,7 +9,7 @@ EXPORT=SERVER.LISTEN:PORT
 ## DATABASE
 
 Database(core/Split) OUT -> SERVER ReadListDb(pgorm/Read)
-Database() OUT -> SERVER ReadActiveDb(pgorm/Read)
+Database() OUT -> DATABASE GetActive(example-todo-server/Get)
 Database() OUT -> SERVER UpdateDb(pgorm/Write)
 
 ## HTTP
@@ -40,19 +40,8 @@ ReadListToken() OUT -> IN ArrayifyReadOutput(adapters/PacketsToArray) OUT -> IN 
 
 # Getting only active TODOs
 
-'true' -> KEEP ActiveQuery(cache/Cache)
-'todos' -> GROUP ActiveTable(core/Group)
-'completed,=,true' -> IN ArrayifyActiveQuery(adapters/TupleToArray) OUT -> IN ActiveTable() OUT -> IN ActiveQuery()
-
-'body' -> IN ArrayifyActivePattern(adapters/TupleToArray) OUT -> PATTERN LiftActiveBody(lift/Lift)
-LiftActiveBody() EXTOKEN -> GROUP ActiveToken(core/Group)
-'1' -> THRESHOLD ReadActiveToken()
-
-GetActiveTodos() OUT -> IN ActiveToGroups(woute/ToGroups) OUT -> IN LiftActiveBody() EXTRACTED -> READY ActiveQuery() OUT -> IN ActiveToken() OUT -> IN ReadActiveDb()
-ReadActiveDb() ERROR -> IN ReadActiveDbError(core/Output)
-ReadActiveDb() OUT -> IN ReadActiveToken(groups/ReadGroups)
-ReadActiveToken() GROUP -> RETOKEN LiftActiveBody()
-ReadActiveToken() OUT -> IN ArrayifyActiveOutput(adapters/PacketsToArray) OUT -> IN JsonifyActiveOutput(strings/Jsonify) OUT -> RETURN LiftActiveBody() OUT -> IN ActiveFromGroups(woute/FromGroups) OUT -> IN Output()
+'completed,=,true' -> QUERY GetActive()
+GetActiveTodos() OUT -> IN GetActive() OUT -> IN Output()
 
 # Creating/Updating TODOs
 
