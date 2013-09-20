@@ -2,6 +2,8 @@ EXPORT=TOGROUPS.IN:IN
 EXPORT=ARRAYIFYQUERY.IN:QUERY
 EXPORT=FROMGROUPS.OUT:OUT
 EXPORT=READDB.SERVER:DATABASE
+EXPORT=ARRAYIFYOUTPUT.OUT:PROCOUT
+EXPORT=JSONIFYOUTPUT.IN:PROCIN
 
 'true' -> KEEP Query(cache/Cache)
 'todos' -> GROUP Table(groups/Group)
@@ -15,4 +17,5 @@ ToGroups(woute/ToGroups) OUT -> IN LiftBody() EXTRACTED -> READY Query() OUT -> 
 ReadDb() ERROR -> IN ReadDbError(core/Output)
 ReadDb() OUT -> IN ReadToken(groups/ReadGroups)
 ReadToken() GROUP -> RETOKEN LiftBody()
-ReadToken() OUT -> IN ArrayifyOutput(adapters/PacketsToArray) OUT -> IN JsonifyActiveOutput(strings/Jsonify) OUT -> RETURN LiftBody() OUT -> IN FromGroups(woute/FromGroups)
+ReadToken() OUT -> IN ArrayifyOutput(adapters/PacketsToArray)
+JsonifyOutput(strings/Jsonify) OUT -> RETURN LiftBody() OUT -> IN FromGroups(woute/FromGroups)

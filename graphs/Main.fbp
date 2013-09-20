@@ -25,12 +25,12 @@ Output(core/Merge) OUT -> IN SendResponse(webserver/SendResponse)
 # Listing TODOs
 
 'id,LIKE,\'%%\'' -> QUERY List()
-ListTodos() OUT -> IN List() OUT -> IN Output()
+ListTodos() OUT -> IN List() PROCOUT -> PROCIN List() OUT -> IN Output()
 
 # Getting only active TODOs
 
 'completed,=,true' -> QUERY GetActive()
-GetActiveTodos() OUT -> IN GetActive() OUT -> IN Output()
+GetActiveTodos() OUT -> IN GetActive() PROCOUT -> PROCIN GetActive() OUT -> IN Output()
 
 # Creating/Updating TODOs
 
