@@ -40,7 +40,7 @@ Output(core/Merge) OUT -> IN SendResponse(webserver/SendResponse)
 'id,LIKE,\'%%\'' -> IN ArrayifyListQuery(adapters/TupleToArray) OUT -> IN ListTable() OUT -> IN ListQuery()
 
 'body' -> IN ArrayifyListPattern(adapters/TupleToArray) OUT -> PATTERN LiftListBody(lift/Lift)
-LiftListBody() EXTOKEN -> GROUP ListToken(core/Group)
+LiftListBody() EXTOKEN -> GROUP ListToken(groups/Group)
 '1' -> THRESHOLD ReadListToken()
 
 ListTodos() OUT -> IN ListToGroups(woute/ToGroups) OUT -> IN LiftListBody() EXTRACTED -> READY ListQuery() OUT -> IN ListToken() OUT -> IN ReadListDb()
