@@ -2,7 +2,7 @@
   "name": "noflo-example-todo-server",
   "private": true,
   "description": "A server-rendered todo app",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "Kenneth Kan",
     "email": "kenhkan@gmail.com"
