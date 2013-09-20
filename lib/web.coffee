@@ -4,7 +4,7 @@ databaseUrl = process.env.DATABASE_URL
 port = process.env.PORT
 
 initializer = """
-  '#{port}' -> PORT Main(todo/Main)
+  '#{port}' -> PORT Main(example-todo-server/Main)
   '#{databaseUrl}' -> DATABASE Main()
 """
 

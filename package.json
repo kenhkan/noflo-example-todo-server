@@ -1,5 +1,5 @@
 {
-  "name": "todo",
+  "name": "noflo-example-todo-server",
   "private": true,
   "description": "A server-rendered todo app",
   "version": "0.0.1",
@@ -39,5 +39,11 @@
     "chai": "~1.5.0",
     "mocha": "~1.9.0"
   },
-  "keywords": []
+  "keywords": [],
+  "noflo": {
+    "graphs": {
+      "Main": "./graphs/Main.fbp",
+      "Get": "./graphs/Get.fbp"
+    }
+  }
 }
