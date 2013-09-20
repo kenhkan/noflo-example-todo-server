@@ -8,17 +8,6 @@ EXPORT=SERVER.LISTEN:PORT
 
 ## DATABASE
 
-# 'token' -> GROUP WriteToken(core/Group)
-# 'todos' -> GROUP WriteTable(core/Group)
-# '{"id":"1","task":"Go grab NoFlo"}' -> IN ParseJson(strings/ParseJson) OUT -> IN WriteTable() OUT -> IN WriteToken() OUT -> IN Write(pgorm/Write)
-
-# 'token' -> GROUP ReadToken(core/Group)
-# 'todos' -> GROUP ReadTable(core/Group)
-# 'id,LIKE,\'%%\'' -> STRING Payload(strings/SendString) OUT -> IN Arrayify(adapters/TupleToArray) OUT -> IN ReadTable() OUT -> IN ReadToken() OUT -> IN Read(pgorm/Read)
-
-# Database(core/Split) OUT -> SERVER Read(pgorm/Read)
-# Database() OUT -> IN Payload()
-
 Database(core/Split) OUT -> SERVER ReadListDb(pgorm/Read)
 Database() OUT -> SERVER ReadActiveDb(pgorm/Read)
 Database() OUT -> SERVER UpdateDb(pgorm/Write)
