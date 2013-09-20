@@ -9,12 +9,12 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/kenhkan/noflo-example-todo-server"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": ""
+      "url": "https://github.com/kenhkan/noflo-example-todo-server/blob/master/LICENSE.md"
     }
   ],
   "dependencies": {
